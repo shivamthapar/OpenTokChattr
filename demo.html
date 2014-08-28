@@ -9,7 +9,6 @@
     </head>
     <body>
       <div id="container"></div>
-      <link href="//fonts.googleapis.com/css?family=Muli:300,400" rel="stylesheet" type="text/css">
         <script src="https://swww.tokbox.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="OpenTokChattr.js" type="text/javascript" charset="utf-8"></script>
@@ -20,7 +19,7 @@
             var sessionId = "SESSION ID";
             var token = "TOKEN";
             var otSession = OT.initSession(apiKey,sessionId);
-            session.connect(token);
+            otSession.connect(token);
             chattr = new OpenTokChattr("#container","room id",otSession,
              {"draggable": true,
               "closeable": function(){
