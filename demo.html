@@ -19,9 +19,9 @@
             var apiKey = "API KEY";
             var sessionId = "SESSION ID";
             var token = "TOKEN";
-            var session = OT.initSession(apiKey,sessionId);
+            var otSession = OT.initSession(apiKey,sessionId);
             session.connect(token);
-            chattr = new OpenTokChattr("#container","room id",session,
+            chattr = new OpenTokChattr("#container","room id",otSession,
              {"draggable": true,
               "closeable": function(){
                 $("#chattr").hide();

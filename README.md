@@ -15,3 +15,21 @@ Running the Demo
 4. Run `npm install` to install the necessary packages.
 5. Start the server with `node server.js`.
 6. Open your browser to `localhost:8080/demo.html`.
+
+Usage
+-------
+Initialize an OpenTokChattr by calling:
+```Javascript
+var chattr = new OpenTokChattr("#container", "Room Id", otSession, options);
+```
+The first argument is the jQuery selector string for the container element of the OpenTokChattr window.
+The second argument is the name of the room, which will appear at the top of the OpenTokChattr window.
+The third argument is the OpenTok Session object that was previously initialized.
+The final (and optional) argument is an object of any additional options. Include any of the following in the options argument:
+```Javascript
+var options = {
+  "draggable": true, //Allows the chat window to be dragged
+  "closeable": function(){ //Shows a close icon and performs this function when it is clicked
+    $("#chattr").hide();
+  }
+}
