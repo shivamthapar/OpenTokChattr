@@ -1,6 +1,6 @@
 OpenTokChattr
 =============
-A multi-party text chat plugin written in Javascript. This project is built upon the [Signaling Library](https://tokbox.com/opentok/tutorials/signaling/js) of the [OpenTok API](https://tokbox.com).
+A simple multi-party text chat plugin written in Javascript. This project is built upon the [Signaling Library](https://tokbox.com/opentok/tutorials/signaling/js) of the [OpenTok API](https://tokbox.com).
 
 Dependencies
 -------------
