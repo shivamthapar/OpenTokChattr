@@ -18,7 +18,23 @@ Running the Demo
 
 Usage
 -------
-Initialize an OpenTokChattr by calling:
+First, include the OpenTok JS library and the jQuery Library.
+```html
+<script src="https://swww.tokbox.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
+```
+Then, add the OpenTokChattr dependencies, `jquery.event.ue` and `jquery-udraggable`.
+```html
+<script src="libs/jquery.udraggable.js" type="text/javascript" charset="utf-8"></script>
+<script src="libs/jquery.event.ue.js" type="text/javascript" charset="utf-8"></script>
+```
+Finally, add the OpenTokChattr JS and CSS files.
+```html
+<script src="OpenTokChattr.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="OpenTokChattr.css" />
+```
+
+Now, initialize an OpenTokChattr by calling:
 ```Javascript
 var chattr = new OpenTokChattr("#container", "Room Id", otSession, options);
 ```
