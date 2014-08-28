@@ -34,6 +34,14 @@ Finally, add the OpenTokChattr JS and CSS files.
 <link rel="stylesheet" type="text/css" href="OpenTokChattr.css" />
 ```
 
+Create an OpenTok session and connect to the session.
+```Javascript
+var apiKey = "API KEY";
+var sessionId = "SESSION ID";
+var token = "TOKEN";
+var otSession = OT.initSession(apiKey,sessionId);
+otSession.connect(token);
+```
 Now, initialize an OpenTokChattr by calling:
 ```Javascript
 var chattr = new OpenTokChattr("#container", "Room Id", otSession, options);
