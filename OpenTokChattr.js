@@ -6,6 +6,7 @@ function OpenTokChattr(targetElem, roomId,session, options){
   this.users = {};
   this.options = options;
   this.session = session;
+  this.initialized = false;
   this.initOpenTok();
   this.targetElem.append(this.baseHtml);
   this.targetElem.find("#chattr #roomId").html(this.roomId); 
@@ -20,6 +21,7 @@ OpenTokChattr.prototype = {
       sessionConnected: function(sessionConnectEvent){
         console.log("SESSION CONNECTED");
         _this.setName(_this._defaultNickname(_this.session.connection.connectionId));
+        setTimeout(function(){_this.initialized = true;}, 2000);
       },
       signal: function(signal){
         console.log(signal);
@@ -28,11 +30,16 @@ OpenTokChattr.prototype = {
           case "signal:chat":
             console.log("CHAT RECEIVED");
             console.log(signalData);
+            _this.messages.push({"type": "chat", data: signalData});
             _this.printMessage({"type": "chat", data: signalData});
             
             break;
           case "signal:updateUsers":
             _this.users = signalData;
+            break;
+          case "signal:newUser":
+            //_this.messages.push({"type": "newUser", data: signalData});
+            //_this.printMessage({"type": "newUser", data:signalData});
             break;
           case "signal:name":
             var nameData = {"oldName": _this.getNickname(signalData[0]), "newName": signalData[1]};
@@ -49,13 +56,25 @@ OpenTokChattr.prototype = {
           case "signal:generalUpdate":
             _this.printMessage({"type": "generalUpdate", data:signalData});
             break;
+          case "signal:pastMessages":
+            if(!_this.initialized){
+              _this.messages = signalData.messages;
+              _this.printMessages();
+              _this.initialized = true;}
+            break;
         }
       },
       connectionCreated: function(event){
-        _this.updateUsers();
-        console.log("USERS UPDATED");
-        _this.signalUpdateUsers();
-        _this.printMessage({"type": "newUser", data:{"from":event.connection.connectionId}});
+        if(_this.initialized){
+          var connectionId = event.connection.connectionId;
+          _this.sendSignal("pastMessages", {"messages":_this.messages}, event.connection);
+          _this.users[connectionId] = _this._defaultNickname(connectionId);
+          console.log("CONNECTION CREATED, NEW USER");
+          console.log(_this.users);
+          //NAME is coming out as undefined
+          _this.signalUpdateUsers();
+        }
+        _this.printMessage({"type": "newUser", data: event.connection.connectionId});
       },
       connectionDestroyed: function(event){
         _this.printMessage({"type": "userLeave", data:{"from":event.connection.connectionId}});
@@ -116,6 +135,12 @@ OpenTokChattr.prototype = {
           <input type='text' id='chatInput' placeholder= 'Write here...'  /> \
         </div> \
       </div>",
+  //iterate through messages in printMessages
+  printMessages: function(){
+    for(var i = 0; i<_this.messages.length; i++){
+      _this.printMessage(_this.messages[i]);
+    }
+  },
   printMessage: function(msg){
     var data = msg.data;
     var html = "";
@@ -152,9 +177,9 @@ OpenTokChattr.prototype = {
         }
         break;
       case "newUser":
-        if(!_this.isMe(data.from)||!data.from){
+        if(!_this.isMe(data.from)||!data){
           html+="<li class= 'status newUser'>";
-          html+="<p><span>"+_this.getNickname(data.from)+"</span> has joined the room</p>";
+          html+="<p><span>"+_this.getNickname(data)+"</span> has joined the room</p>";
         }
         break;
       case "userLeave":
@@ -219,17 +244,6 @@ OpenTokChattr.prototype = {
     console.log(_this.users);
     _this.sendSignal("updateUsers", _this.users);
   },
-  updateUsers: function(){
-    var connections = _this.session.connections.where({});
-    for(var i=0; i<connections.length; i++){
-      var connectionId = connections[i].connectionId;
-      if(connectionId.indexOf("symphony")<0){ // Workaround for extra connection
-        if(!(connectionId in _this.users)){
-            _this.users[connectionId]=_this._defaultNickname(connectionId);
-        }
-      }
-    }
-  },
   sendListSignal: function(){
     var list = [];
     for(var k in _this.users){
@@ -238,7 +252,7 @@ OpenTokChattr.prototype = {
     _this.sendSignal("list",{"users":list, "from":_this.session.connection.connectionId});
   },
   getNickname: function(connectionId){
-    return _this.users[connectionId];
+    return _this.users[connectionId] || _this._defaultNickname(connectionId);
 //  code to return "me" for messages sent by myself
 //    if(!_this.isMe(connectionId))
 //      return _this.users[connectionId];
@@ -278,18 +292,3 @@ OpenTokChattr.prototype = {
   }
 */
 }
-/**
-Google Fonts
-**/
-WebFontConfig = {
-  google: { families: [ 'Muli:300,400:latin' ] }
-};
-(function() {
-  var wf = document.createElement('script');
-  wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-    '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-  wf.type = 'text/javascript';
-  wf.async = 'true';
-  var s = document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(wf, s);
-})();
