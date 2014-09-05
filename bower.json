@@ -16,6 +16,10 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "package.json",
+    ".gitignore",
+    "server.js",
+    "README.md", 
     "test",
     "tests"
   ],
