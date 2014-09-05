@@ -1,0 +1,24 @@
+{
+  "name": "OpenTokChattr",
+  "version": "0.0.0",
+  "description": "Text chat module built with OpenTok API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shivamthapar/OpenTokChattr.git"
+  },
+  "keywords": [
+    "opentok",
+    "textchat"
+  ],
+  "author": "Shivam Thapar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shivamthapar/OpenTokChattr/issues"
+  },
+  "homepage": "https://github.com/shivamthapar/OpenTokChattr"
+}

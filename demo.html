@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>OpenTok Chattr -- Text Chat using OpenTok</title>
+        <link rel="stylesheet" type="text/css" href="OpenTokChattr.css" />
+    </head>
+    <body>
+      <div id="container"></div>
+        <script src="https://swww.tokbox.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="libs/jquery.udraggable.js" type="text/javascript" charset="utf-8"></script>
+        <script src="libs/jquery.event.ue.js" type="text/javascript" charset="utf-8"></script>
+        <script src="OpenTokChattr.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            var apiKey = "API KEY";
+            var sessionId = "SESSION ID";
+            var token = "TOKEN";
+            var otSession = OT.initSession(apiKey,sessionId);
+            otSession.connect(token);
+            chattr = new OpenTokChattr("#container","room id",otSession,
+             {"draggable": true,
+              "closeable": function(){
+                $("#chattr").hide();
+              }
+             }
+            );
+        </script>
+    </body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "opentok-chattr",
+  "version": "0.0.0",
+  "description": "Multi-party text chat plugin that works with OpenTok",
+  "keywords": [
+    "opentok",
+    "textchat",
+    "chattr"
+  ],
+  "authors": [
+    "Shivam Thapar"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/shivamthapar/OpenTokChattr",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1"
+  }
+}
