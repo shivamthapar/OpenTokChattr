@@ -19,17 +19,13 @@ OpenTokChattr.prototype = {
   initOpenTok: function(){
     _this.session.on({
       sessionConnected: function(sessionConnectEvent){
-        console.log("SESSION CONNECTED");
         _this.setName(_this._defaultNickname(_this.session.connection.connectionId));
         setTimeout(function(){_this.initialized = true;}, 2000);
       },
       signal: function(signal){
-        console.log(signal);
         var signalData = JSON.parse(signal.data);
         switch(signal.type){
           case "signal:chat":
-            console.log("CHAT RECEIVED");
-            console.log(signalData);
             _this.messages.push({"type": "chat", data: signalData});
             _this.printMessage({"type": "chat", data: signalData});
             
@@ -47,7 +43,6 @@ OpenTokChattr.prototype = {
             _this.printMessage({"type": "status", data:nameData});
             break;
           case "signal:help":
-            console.log("help signal recieved");
             _this.printMessage({"type": "help", data:signalData});
             break;
           case "signal:list":
@@ -69,8 +64,6 @@ OpenTokChattr.prototype = {
           var connectionId = event.connection.connectionId;
           _this.sendSignal("pastMessages", {"messages":_this.messages}, event.connection);
           _this.users[connectionId] = _this._defaultNickname(connectionId);
-          console.log("CONNECTION CREATED, NEW USER");
-          console.log(_this.users);
           //NAME is coming out as undefined
           _this.signalUpdateUsers();
         }
@@ -79,7 +72,6 @@ OpenTokChattr.prototype = {
       connectionDestroyed: function(event){
         _this.printMessage({"type": "userLeave", data:{"from":event.connection.connectionId}});
         delete _this.users[event.connection.connectionId];
-        console.log("USERS UPDATED");
       },
     });
   },
@@ -110,9 +102,7 @@ OpenTokChattr.prototype = {
     }
   },
   sendSignal:function(type, data, to){
-     console.log("SEND CHAT SIGNAL");
      var signalData = {type: type,data: JSON.stringify(data)};
-     console.log(signalData);
      if(to)
       signalData.to=to;
     _this.session.signal(signalData,_this.signalError);
@@ -156,7 +146,6 @@ OpenTokChattr.prototype = {
         html = "<li class = 'status'><p><span class='oldName'>"+data.oldName+"</span> is now known as <span class='newName'>"+data.newName+"</span></p></li>";
         break;
       case "help":
-        console.log("/help");
         if(_this.isMe(data.from)){
           html+= "<li class = 'status help'>";
           html+= "<p>Type <span>/name your_name</span> to change your display name</p>";
@@ -240,8 +229,6 @@ OpenTokChattr.prototype = {
     _this.sendSignal("name", data);
   },
   signalUpdateUsers: function(){
-    console.log("signal user update");
-    console.log(_this.users);
     _this.sendSignal("updateUsers", _this.users);
   },
   sendListSignal: function(){
