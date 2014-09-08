@@ -86,7 +86,7 @@ ol, ul {
   right: 10px;
   position: absolute;
   top: 14px;
-  background: url('libs/img/x.png');
+  background: url('img/x.png');
   cursor: pointer;
 }
 #chattr .inner-chat{
