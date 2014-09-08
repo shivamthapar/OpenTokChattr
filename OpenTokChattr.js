@@ -12,6 +12,14 @@ function OpenTokChattr(targetElem, roomId,session, options){
   this.targetElem.find("#chattr #roomId").html(this.roomId); 
   $("#chatInput").keyup(_this.checkKeyPress);
   this.uiActions();
+  // Every 10 seconds update the times for everyone
+  setInterval(function () {
+    $('.chat p').each(function () {
+      var date = $(this).attr('data-date');
+      var timeDiff = _this._timeDifference(new Date(date), new Date());
+      $(this).attr('title',timeDiff);
+    });
+  }, 10000);
 }
 OpenTokChattr.prototype = {
   _this:this,
@@ -32,10 +40,6 @@ OpenTokChattr.prototype = {
             break;
           case "signal:updateUsers":
             _this.users = signalData;
-            break;
-          case "signal:newUser":
-            //_this.messages.push({"type": "newUser", data: signalData});
-            //_this.printMessage({"type": "newUser", data:signalData});
             break;
           case "signal:name":
             var nameData = {"oldName": _this.getNickname(signalData[0]), "newName": signalData[1]};
@@ -64,7 +68,6 @@ OpenTokChattr.prototype = {
           var connectionId = event.connection.connectionId;
           _this.sendSignal("pastMessages", {"messages":_this.messages}, event.connection);
           _this.users[connectionId] = _this._defaultNickname(connectionId);
-          //NAME is coming out as undefined
           _this.signalUpdateUsers();
         }
         _this.printMessage({"type": "newUser", data: event.connection.connectionId});
@@ -140,7 +143,7 @@ OpenTokChattr.prototype = {
         var nickname=data.name+": ";
         var message=decodeURI(data.text);
         var cls = _this.isMe(data.from)?"from-me":"from-others";
-        html="<li class='"+cls+"'><label>"+nickname+"</label><p title='"+time+"'>"+message+"</p>";
+        html="<li class='chat "+cls+"'><label>"+nickname+"</label><p data-date='"+data.date+"' title='"+time+"'>"+message+"</p>";
         break;
       case "status":
         html = "<li class = 'status'><p><span class='oldName'>"+data.oldName+"</span> is now known as <span class='newName'>"+data.newName+"</span></p></li>";
@@ -197,9 +200,6 @@ OpenTokChattr.prototype = {
       case "/name":
       case "/nick":
        _this.sendSignal("name", [_this.session.connection.connectionId, parts[1]]);
-//        var oldName = _this.users[_this.session.connection.connectionId];
-//        _this.setName(parts[1]);
-//        _this.sendNameSignal(oldName,parts[1]);
         break;
       case "/help":
         _this.sendHelpSignal();
@@ -240,10 +240,6 @@ OpenTokChattr.prototype = {
   },
   getNickname: function(connectionId){
     return _this.users[connectionId] || _this._defaultNickname(connectionId);
-//  code to return "me" for messages sent by myself
-//    if(!_this.isMe(connectionId))
-//      return _this.users[connectionId];
-//    return "me ("+_this.users[connectionId]+")";
   },
   isMe: function(connectionId){
     return connectionId===_this.session.connection.connectionId;
@@ -257,25 +253,20 @@ OpenTokChattr.prototype = {
 
   _timeDifference: function(d1,d2){
     var seconds = (d2.getTime()-d1.getTime())/1000;
-    if(seconds>=60 && seconds<3600)
+    if(seconds>=60 && seconds<120)
+      return "1 minute ago";
+    else if(seconds>=120 && seconds<3600)
       return parseInt(seconds/60,10)+" minutes ago";
-    else if (seconds>=3600)
+    else if(seconds>=3600 && seconds<7200)
+      return "1 hour ago";
+    else if (seconds>=7200)
       return parseInt(seconds/3600,10)+" hours ago";
-    else if (seconds>=1)
-      return parseInt(seconds,10)+" seconds ago";
+    else if (seconds>=10)
+      return "Less than a minute ago";
     else
       return "Just now";
   },
   _defaultNickname: function(connectionId){
     return "Guest-"+connectionId.substring( connectionId.length - 8, connectionId.length )
   }
-/*
-  _compareConnectionByCreation: function(a,b) {
-    if (Date.parse(creationTime)h)
-       return -1;
-    if (a.last_nom > b.last_nom)
-      return 1;
-    return 0;
-  }
-*/
 }
