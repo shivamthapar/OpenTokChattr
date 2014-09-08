@@ -148,7 +148,7 @@ OpenTokChattr.prototype = {
       case "chat":
         var time = this._timeDifference(new Date(data.date),new Date());
         var nickname=data.name+": ";
-        var message=data.text;
+        var message=decodeURI(data.text);
         var cls = _this.isMe(data.from)?"from-me":"from-others";
         html="<li class='"+cls+"'><label>"+nickname+"</label><p title='"+time+"'>"+message+"</p>";
         break;
@@ -229,7 +229,7 @@ OpenTokChattr.prototype = {
   },
   sendChat: function(msg){
     var date = new Date();
-    var data = {name: _this.getNickname(_this.session.connection.connectionId), text: msg, date: date, from: _this.session.connection.connectionId};
+    var data = {name: _this.getNickname(_this.session.connection.connectionId), text: encodeURI(msg), date: date, from: _this.session.connection.connectionId};
     _this.sendSignal("chat", data);
   },
   sendGeneralUpdate: function(msg){
