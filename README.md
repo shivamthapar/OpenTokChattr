@@ -5,7 +5,9 @@ A simple multi-party text chat plugin written in Javascript. This project is bui
 Installation
 ------------
 Install using [Bower](https://github.com/bower/bower):
+
 `bower install opentok-chattr`
+
 or clone this repo.
 
 Dependencies
