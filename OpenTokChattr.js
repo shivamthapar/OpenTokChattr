@@ -262,7 +262,7 @@ OpenTokChattr.prototype = {
     else if (seconds>=7200)
       return parseInt(seconds/3600,10)+" hours ago";
     else if (seconds>=10)
-      return "Less than a minute ago";
+      return parseInt(seconds/60,10)+" seconds ago";
     else
       return "Just now";
   },
