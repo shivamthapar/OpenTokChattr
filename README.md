@@ -2,6 +2,14 @@ OpenTokChattr
 =============
 A simple multi-party text chat plugin written in Javascript. This project is built upon the [Signaling Library](https://tokbox.com/opentok/tutorials/signaling/js) of the [OpenTok API](https://tokbox.com).
 
+Installation
+------------
+Install using [Bower](https://github.com/bower/bower):
+
+`bower install opentok-chattr`
+
+or clone this repo.
+
 Dependencies
 -------------
 The [OpenTok for WebRTC JS API](http://www.tokbox.com/opentok) is required.
@@ -10,27 +18,25 @@ The [jquery.event.ue](https://github.com/mmikowski/jquery.event.ue) and [jquery-
 Running the Demo
 ------------------
 1. Clone [this repo](https://github.com/shivamthapar/OpenTokChattr).
-2. Get my API Key, Session ID, and Token from your [TokBox Dashboard](http://dashboard.tokbox.com/). For help on this step, visit the [Quickstart page](https://tokbox.com/opentok/quick-start/) in the OpenTok Docs. 
-3. Replace `API KEY`, `SESSION ID`, and `TOKEN` with your corresponding credentials.
-4. Run `npm install` to install the necessary packages.
-5. Start the server with `node server.js`.
-6. Open your browser to `localhost:8080/demo.html`.
+2. Get your API Key, Session ID, and Token from your [TokBox Dashboard](http://dashboard.tokbox.com/). For help on this step, visit the [Quickstart page](https://tokbox.com/opentok/quick-start/) in the OpenTok Docs. 
+3. In `demo.html`, eplace `API KEY`, `SESSION ID`, and `TOKEN` with your corresponding credentials.
+4. Serve `demo.html` on a web-server using e.g. `npm install http-server -g;http-server` or `python -m SimpleHTTPServer 8000`
 
 Usage
 -------
-First, include the OpenTok JS library and the jQuery Library.
+See [demo.html](https://github.com/shivamthapar/OpenTokChattr/blob/master/demo.html) for a complete example.
+
+Include all required scripts:
 ```html
-<script src="https://swww.tokbox.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
-```
-Then, add the OpenTokChattr dependencies, `jquery.event.ue` and `jquery-udraggable`.
-```html
-<script src="libs/jquery.udraggable.js" type="text/javascript" charset="utf-8"></script>
-<script src="libs/jquery.event.ue.js" type="text/javascript" charset="utf-8"></script>
-```
-Finally, add the OpenTokChattr JS and CSS files.
-```html
+<script src="//static.opentok.com/webrtc/v2.2/js/opentok.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/jquery.event.ue/jquery.event.ue.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/jquery.udraggable/jquery.udraggable.js" type="text/javascript" charset="utf-8"></script>
 <script src="OpenTokChattr.js" type="text/javascript" charset="utf-8"></script>
+```
+
+Include the `OpenTokChattr.css` file:
+```html
 <link rel="stylesheet" type="text/css" href="OpenTokChattr.css" />
 ```
 
