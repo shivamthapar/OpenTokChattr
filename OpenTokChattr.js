@@ -148,7 +148,7 @@ OpenTokChattr.prototype = {
       case "chat":
         var time = this._timeDifference(new Date(data.date),new Date());
         var nickname=data.name+": ";
-        var message=decodeURI(data.text);
+        var message=decodeURI(data.text).replace(/</g, '&lt;').replace(/>/g, '&gt;');
         var cls = _this.isMe(data.from)?"from-me":"from-others";
         html="<li class='"+cls+"'><label>"+nickname+"</label><p title='"+time+"'>"+message+"</p>";
         break;
