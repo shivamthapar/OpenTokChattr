@@ -236,9 +236,7 @@ OpenTokChattr.prototype = {
     _this.sendSignal("selfUpdate", data);
   },
   sendNameSignal: function(connectionId, newName){
-    console.log("SEND NAME SIGNAL");
     for(var k in _this.users){
-      console.log("USER: "+_this.users[k]);
       if(_this.users[k]===newName){
         var msg = "<p>User <span>"+newName+"</span> already exists. Please choose another name.</p>";
         _this.sendSelfUpdate(msg);
