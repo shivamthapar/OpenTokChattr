@@ -209,9 +209,9 @@ ol, ul {
 #chattr .inner-chat ul#messages li.status p:after {
   border: none;
 }
-#chattr .inner-chat ul#messages li.status.help p, #chattr .inner-chat ul#messages li.status.list p{
+#chattr .inner-chat ul#messages li.status.help p, #chattr .inner-chat ul#messages li.status p.userList{
   margin-bottom: 0px;
 }
-#chattr .inner-chat ul#messages li.status.help p.last, #chattr .inner-chat ul#messages li.status.list p.last{
+#chattr .inner-chat ul#messages li.status.help p.last, #chattr .inner-chat ul#messages li.status p.userList.last{
   margin-bottom: 30px;
 }

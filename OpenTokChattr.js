@@ -40,6 +40,7 @@ OpenTokChattr.prototype = {
             break;
           case "signal:updateUsers":
             _this.users = signalData;
+            _this.initialized = true;
             break;
           case "signal:name":
             var oldName = _this.getNickname(signalData.from);
@@ -49,9 +50,6 @@ OpenTokChattr.prototype = {
             break;
           case "signal:help":
             _this.printMessage({"type": "help", data:signalData});
-            break;
-          case "signal:list":
-            _this.printMessage({"type": "list", data:signalData});
             break;
           case "signal:generalUpdate":
             _this.printMessage({"type": "generalUpdate", data:signalData});
@@ -63,7 +61,7 @@ OpenTokChattr.prototype = {
             if(!_this.initialized){
               _this.messages = signalData.messages;
               _this.printMessages();
-              _this.initialized = true;}
+            }
             break;
         }
       },
@@ -152,17 +150,6 @@ OpenTokChattr.prototype = {
       case "status":
         html = "<li class = 'status'><p><span class='oldName'>"+data.oldName+"</span> is now known as <span class='newName'>"+data.newName+"</span></p></li>";
         break;
-      case "list":
-        if(_this.isMe(data.from)){
-          html+="<li class = 'status list'><p>Users in this room right now</p>";
-          for(var i=0; i<data.users.length; i++){
-            if(i<data.users.length-1)
-              html+="<p>- "+data.users[i]+"</p>";
-            else
-              html+="<p class='last'>- "+data.users[i]+"</p>";
-          }
-        }
-        break;
       case "newUser":
         if(!_this.isMe(data.from)||!data){
           html+="<li class= 'status newUser'>";
@@ -180,11 +167,6 @@ OpenTokChattr.prototype = {
         break;
       case "selfUpdate":
         if(_this.isMe(data.from)){
-         // html+= "<li class = 'status help'>";
-         // html+= "<p>Type <span>/name your_name</span> to change your display name</p>";
-         // html+= "<p>Type <span>/list</span> to see a list of users in the room</p>";
-         // html+= "<p class='last'>Type <span>/help</span> to see a list of commands</p>";
-         // html+="</li>";
           html+="<li class = 'status'>"+data.text+"</li>";
         }
         break;
@@ -204,7 +186,7 @@ OpenTokChattr.prototype = {
     switch(parts[0]){
       case "/name":
       case "/nick":
-        _this.sendChangeNameSignal(_this.session.connection.connectionId, parts[1]);
+        _this.sendChangeNameSignal(parts[1]);
         break;
       case "/help":
         _this.sendHelpSignal();
@@ -250,11 +232,18 @@ OpenTokChattr.prototype = {
     _this.sendSignal("updateUsers", _this.users);
   },
   sendListSignal: function(){
-    var list = [];
+    var names = [];
     for(var k in _this.users){
-      list.push(_this.users[k])
+      names.push(_this.users[k]);
     }
-    _this.sendSignal("list",{"users":list, "from":_this.session.connection.connectionId});
+    var html = "<p class='userList'>Users in this room right now</p>";
+    for(var i = 0; i<names.length; i++){  
+      if(i<names.length-1)
+        html+="<p class='userList'>- "+names[i]+"</p>";
+      else
+        html+="<p class='userList last'>- "+names[i]+"</p>";
+    }
+    _this.sendSelfUpdate(html);
   },
   getNickname: function(connectionId){
     return _this.users[connectionId] || _this._defaultNickname(connectionId);
