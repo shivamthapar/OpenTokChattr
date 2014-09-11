@@ -38,10 +38,6 @@ OpenTokChattr.prototype = {
             _this.printMessage({"type": "chat", data: signalData});
             
             break;
-          case "signal:updateUsers":
-            _this.users = signalData;
-            _this.initialized = true;
-            break;
           case "signal:name":
             var oldName = _this.getNickname(signalData.from);
             var nameData = {"oldName": oldName, "newName": signalData.newName}; 
@@ -60,7 +56,9 @@ OpenTokChattr.prototype = {
           case "signal:pastMessages":
             if(!_this.initialized){
               _this.messages = signalData.messages;
+              _this.users = signalData.users;
               _this.printMessages();
+              _this.initialized = true;
             }
             break;
         }
@@ -68,9 +66,10 @@ OpenTokChattr.prototype = {
       connectionCreated: function(event){
         if(_this.initialized){
           var connectionId = event.connection.connectionId;
-          _this.sendSignal("pastMessages", {"messages":_this.messages}, event.connection);
-          _this.users[connectionId] = _this._defaultNickname(connectionId);
-          _this.signalUpdateUsers();
+          if(!(connectionId in _this.users)){
+            _this.users[connectionId] = _this._defaultNickname(connectionId);
+          }
+          _this.sendSignal("pastMessages", {"messages":_this.messages, "users": _this.users}, event.connection);
         }
         _this.printMessage({"type": "newUser", data: event.connection.connectionId});
       },
