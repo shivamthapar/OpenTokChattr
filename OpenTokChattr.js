@@ -204,7 +204,7 @@ OpenTokChattr.prototype = {
     switch(parts[0]){
       case "/name":
       case "/nick":
-        _this.sendNameSignal(_this.session.connection.connectionId, parts[1]);
+        _this.sendChangeNameSignal(_this.session.connection.connectionId, parts[1]);
         break;
       case "/help":
         _this.sendHelpSignal();
@@ -235,7 +235,7 @@ OpenTokChattr.prototype = {
     var data = {from: _this.session.connection.connectionId, text: msg};
     _this.sendSignal("selfUpdate", data);
   },
-  sendNameSignal: function(connectionId, newName){
+  sendChangeNameSignal: function(newName){
     for(var k in _this.users){
       if(_this.users[k]===newName){
         var msg = "<p>User <span>"+newName+"</span> already exists. Please choose another name.</p>";
@@ -243,7 +243,7 @@ OpenTokChattr.prototype = {
         return;
       }
     }
-    var data = {from: connectionId, newName: newName};
+    var data = {from: _this.session.connection.connectionId, newName: newName};
     _this.sendSignal("name", data);
   },
   signalUpdateUsers: function(){
