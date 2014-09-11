@@ -42,8 +42,9 @@ OpenTokChattr.prototype = {
             _this.users = signalData;
             break;
           case "signal:name":
-            var nameData = {"oldName": _this.getNickname(signalData[0]), "newName": signalData[1]};
-            _this.users[signalData[0]] = signalData[1];
+            var oldName = _this.getNickname(signalData.from);
+            var nameData = {"oldName": oldName, "newName": signalData.newName}; 
+            _this.users[signalData.from] = signalData.newName;
             _this.printMessage({"type": "status", data:nameData});
             break;
           case "signal:help":
@@ -54,6 +55,9 @@ OpenTokChattr.prototype = {
             break;
           case "signal:generalUpdate":
             _this.printMessage({"type": "generalUpdate", data:signalData});
+            break;
+          case "signal:selfUpdate":
+            _this.printMessage({"type": "selfUpdate", data:signalData});
             break;
           case "signal:pastMessages":
             if(!_this.initialized){
@@ -148,15 +152,6 @@ OpenTokChattr.prototype = {
       case "status":
         html = "<li class = 'status'><p><span class='oldName'>"+data.oldName+"</span> is now known as <span class='newName'>"+data.newName+"</span></p></li>";
         break;
-      case "help":
-        if(_this.isMe(data.from)){
-          html+= "<li class = 'status help'>";
-          html+= "<p>Type <span>/name your_name</span> to change your display name</p>";
-          html+= "<p>Type <span>/list</span> to see a list of users in the room</p>";
-          html+= "<p class='last'>Type <span>/help</span> to see a list of commands</p>";
-          html+="</li>";
-        }
-        break;
       case "list":
         if(_this.isMe(data.from)){
           html+="<li class = 'status list'><p>Users in this room right now</p>";
@@ -183,6 +178,16 @@ OpenTokChattr.prototype = {
       case "generalUpdate":
         html = "<li class = 'status'><p>"+data.text+"</p></li>";
         break;
+      case "selfUpdate":
+        if(_this.isMe(data.from)){
+         // html+= "<li class = 'status help'>";
+         // html+= "<p>Type <span>/name your_name</span> to change your display name</p>";
+         // html+= "<p>Type <span>/list</span> to see a list of users in the room</p>";
+         // html+= "<p class='last'>Type <span>/help</span> to see a list of commands</p>";
+         // html+="</li>";
+          html+="<li class = 'status'>"+data.text+"</li>";
+        }
+        break;
     }
     $("#messages").append(html);
     $(".inner-chat").scrollTop($(".inner-chat")[0].scrollHeight)
@@ -199,7 +204,7 @@ OpenTokChattr.prototype = {
     switch(parts[0]){
       case "/name":
       case "/nick":
-       _this.sendSignal("name", [_this.session.connection.connectionId, parts[1]]);
+        _this.sendNameSignal(_this.session.connection.connectionId, parts[1]);
         break;
       case "/help":
         _this.sendHelpSignal();
@@ -213,8 +218,10 @@ OpenTokChattr.prototype = {
     $("#chatInput").val("");
   },
   sendHelpSignal: function(){
-    var data = {from: _this.session.connection.connectionId};
-    _this.sendSignal("help", data);
+    var msg = "<p>Type <span>/name your_name</span> to change your display name</p> \
+              <p>Type <span>/list</span> to see a list of users in the room</p> \
+              <p class='last'>Type <span>/help</span> to see a list of commands</p>";
+    _this.sendSelfUpdate(msg);
   },
   sendChat: function(msg){
     var date = new Date();
@@ -224,8 +231,21 @@ OpenTokChattr.prototype = {
   sendGeneralUpdate: function(msg){
     _this.sendSignal("generalUpdate", {"text": msg});
   },
-  sendNameSignal: function(oldName, newName){
-    var data = {oldName: oldName, newName: newName};
+  sendSelfUpdate: function(msg){
+    var data = {from: _this.session.connection.connectionId, text: msg};
+    _this.sendSignal("selfUpdate", data);
+  },
+  sendNameSignal: function(connectionId, newName){
+    console.log("SEND NAME SIGNAL");
+    for(var k in _this.users){
+      console.log("USER: "+_this.users[k]);
+      if(_this.users[k]===newName){
+        var msg = "<p>User <span>"+newName+"</span> already exists. Please choose another name.</p>";
+        _this.sendSelfUpdate(msg);
+        return;
+      }
+    }
+    var data = {from: connectionId, newName: newName};
     _this.sendSignal("name", data);
   },
   signalUpdateUsers: function(){

@@ -203,7 +203,7 @@ ol, ul {
   float: left;
   max-width: none
 }
-#chattr .inner-chat ul#messages li.status p span.newName {
+#chattr .inner-chat ul#messages li.status p span{
   color: white;
 }
 #chattr .inner-chat ul#messages li.status p:after {
@@ -214,7 +214,4 @@ ol, ul {
 }
 #chattr .inner-chat ul#messages li.status.help p.last, #chattr .inner-chat ul#messages li.status.list p.last{
   margin-bottom: 30px;
-}
-#chattr .inner-chat ul#messages li.status.help p span{
-  color: white;
 }
