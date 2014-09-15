@@ -8,10 +8,14 @@ function OpenTokChattr(targetElem, roomId,session, options){
   this.session = session;
   this.initialized = false;
   this.initOpenTok();
-  this.targetElem.append(this.baseHtml);
-  this.targetElem.find("#chattr #roomId").html(this.roomId); 
-  $("#chatInput").keyup(_this.checkKeyPress);
-  this.uiActions();
+  this.templates = {};
+  $.get('src/templates.mustache.html', function(template, textStatus, jqXhr) {
+    _this.initTemplates(template);
+    _this.targetElem.append(Mustache.render(_this.templates.base, {}));
+    _this.targetElem.find("#chattr #roomId").html(_this.roomId); 
+    $("#chatInput").keyup(_this.checkKeyPress);
+    _this.uiActions();
+  });
   // Every 10 seconds update the times for everyone
   setInterval(function () {
     $('.chat p').each(function () {
@@ -24,6 +28,17 @@ function OpenTokChattr(targetElem, roomId,session, options){
 OpenTokChattr.prototype = {
   _this:this,
   constructor: OpenTokChattr,
+  initTemplates: function(template){
+    _this.templates.base = $(template).filter('#baseTpl').html();
+    _this.templates.chat = $(template).filter('#chatTpl').html();
+    _this.templates.status = $(template).filter('#statusTpl').html();
+    _this.templates.newUser = $(template).filter('#newUserTpl').html();
+    _this.templates.userLeave = $(template).filter('#userLeaveTpl').html();
+    _this.templates.update = $(template).filter('#updateTpl').html();
+    _this.templates.userList = $(template).filter('#userListTpl').html();
+    _this.templates.help = $(template).filter('#helpTpl').html();
+    _this.templates.nameExists = $(template).filter('#nameExistsTpl').html();
+  },
   initOpenTok: function(){
     _this.session.on({
       sessionConnected: function(sessionConnectEvent){
@@ -114,21 +129,6 @@ OpenTokChattr.prototype = {
   setName:function(name){
     _this.users[_this.session.connection.connectionId]=name;
   },
-  baseHtml: "<div id = 'chattr'> \
-        <div id='chat_header' class='chat-header' style='cursor: move;'> \
-          <div><span></span><span></span><span></span></div> \
-          <h4 id='roomId'></h4> \
-          <a class='btn-close' title='Close chat'></a> \
-        </div> \
-        <div class='inner-chat'> \
-          <p id = 'displayHelp'> Type /help for a list of commands \
-          <ul id='messages'> \
-          </ul> \
-        </div> \
-        <div class='chat-input-wrapper'> \
-          <input type='text' id='chatInput' placeholder= 'Write here...'  /> \
-        </div> \
-      </div>",
   //iterate through messages in printMessages
   printMessages: function(){
     for(var i = 0; i<_this.messages.length; i++){
@@ -138,40 +138,51 @@ OpenTokChattr.prototype = {
   printMessage: function(msg){
     var data = msg.data;
     var html = "";
+    var tmplData = {};
     switch(msg.type){
       case "chat":
-        var time = this._timeDifference(new Date(data.date),new Date());
-        var nickname=data.name+": ";
-        var message=decodeURI(data.text).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        var cls = _this.isMe(data.from)?"from-me":"from-others";
-        html="<li class='chat "+cls+"'><label>"+nickname+"</label><p data-date='"+data.date+"' title='"+time+"'>"+message+"</p>";
+        tmplData.time = this._timeDifference(new Date(data.date),new Date());
+        tmplData.nickname=data.name+": ";
+        tmplData.message=decodeURI(data.text).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        tmplData.cls = _this.isMe(data.from)?"from-me":"from-others";
+        _this.appendToMessages('chat', tmplData);
         break;
       case "status":
-        html = "<li class = 'status'><p><span class='oldName'>"+data.oldName+"</span> is now known as <span class='newName'>"+data.newName+"</span></p></li>";
+        tmplData.oldName = data.oldName;
+        tmplData.newName = data.newName;
+        _this.appendToMessages('status', tmplData);
         break;
       case "newUser":
         if(!_this.isMe(data.from)||!data){
-          html+="<li class= 'status newUser'>";
-          html+="<p><span>"+_this.getNickname(data)+"</span> has joined the room</p>";
+          tmplData.nickname = _this.getNickname(data);
+          _this.appendToMessages('newUser', tmplData);
         }
         break;
       case "userLeave":
         if(!_this.isMe(data.from)||!data.from){
-          html+="<li class= 'status newUser'>";
-          html+="<p><span>"+_this.getNickname(data.from)+"</span> has left the room</p>";
+          tmplData.nickname = _this.getNickname(data.from);
+          _this.appendToMessages('userLeave', tmplData);
         }
         break;
       case "generalUpdate":
-        html = "<li class = 'status'><p>"+data.text+"</p></li>";
+        tmplData.text = data.text; 
+        _this.appendToMessages('update', tmplData);
         break;
       case "selfUpdate":
+          tmplData.cls = data.cls;
         if(_this.isMe(data.from)){
-          html+="<li class = 'status'>"+data.text+"</li>";
+          tmplData.text = data.text; 
+          tmplData.cls = data.cls;
+          _this.appendToMessages('update', tmplData);
         }
         break;
     }
     $("#messages").append(html);
     $(".inner-chat").scrollTop($(".inner-chat")[0].scrollHeight)
+  },
+  appendToMessages: function(template, data){
+    console.log(Mustache.render(_this.templates[template],data));
+    $("#chattr .inner-chat ul#messages").append(Mustache.render(_this.templates[template],data));
   },
   checkKeyPress: function(e){
     var code = (e.keyCode ? e.keyCode : e.which);
@@ -199,10 +210,7 @@ OpenTokChattr.prototype = {
     $("#chatInput").val("");
   },
   sendHelpSignal: function(){
-    var msg = "<p>Type <span>/name your_name</span> to change your display name</p> \
-              <p>Type <span>/list</span> to see a list of users in the room</p> \
-              <p class='last'>Type <span>/help</span> to see a list of commands</p>";
-    _this.sendSelfUpdate(msg);
+    _this.sendSelfUpdate(_this.templates.help, "help");
   },
   sendChat: function(msg){
     var date = new Date();
@@ -212,14 +220,14 @@ OpenTokChattr.prototype = {
   sendGeneralUpdate: function(msg){
     _this.sendSignal("generalUpdate", {"text": msg});
   },
-  sendSelfUpdate: function(msg){
-    var data = {from: _this.session.connection.connectionId, text: msg};
+  sendSelfUpdate: function(msg,cls){
+    var data = {from: _this.session.connection.connectionId, text: msg, cls: cls};
     _this.sendSignal("selfUpdate", data);
   },
   sendChangeNameSignal: function(newName){
     for(var k in _this.users){
       if(_this.users[k]===newName){
-        var msg = "<p>User <span>"+newName+"</span> already exists. Please choose another name.</p>";
+        var msg = Mustache.render(_this.templates.nameExists, {newName: newName});
         _this.sendSelfUpdate(msg);
         return;
       }
@@ -235,13 +243,15 @@ OpenTokChattr.prototype = {
     for(var k in _this.users){
       names.push(_this.users[k]);
     }
-    var html = "<p class='userList'>Users in this room right now</p>";
+    var html = "";
+    var data = {users:[]};
     for(var i = 0; i<names.length; i++){  
-      if(i<names.length-1)
-        html+="<p class='userList'>- "+names[i]+"</p>";
-      else
-        html+="<p class='userList last'>- "+names[i]+"</p>";
+      var userData = {name: names[i]};
+      if(i==names.length-1)
+        userData.last = "last";
+      data.users.push(userData);
     }
+    html=Mustache.render(_this.templates.userList,data)
     _this.sendSelfUpdate(html);
   },
   getNickname: function(connectionId){
@@ -249,10 +259,6 @@ OpenTokChattr.prototype = {
   },
   isMe: function(connectionId){
     return connectionId===_this.session.connection.connectionId;
-  },
-  displayChatMessage: function(msg){
-    var html = "<li class = 'chatMsg'><p>"+msg+"</p></li>";
-    $("ul#messages").append(html);
   },
 
   //Helper Methods
