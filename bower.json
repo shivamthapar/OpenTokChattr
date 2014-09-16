@@ -25,6 +25,7 @@
   "dependencies": {
     "jquery": "~2.1.1",
     "jquery.event.ue": "mmikowski/jquery.event.ue",
-    "jquery.udraggable": "grantm/jquery-udraggable"
+    "jquery.udraggable": "grantm/jquery-udraggable",
+    "mustache": "~0.8.2"
   }
 }

@@ -1,0 +1,56 @@
+<script id = "baseTpl" type = "text/html">
+<div id = 'chattr'> 
+  <div id='chat_header' class='chat-header' style='cursor: move;'> 
+    <div><span></span><span></span><span></span></div> 
+    <h4 id='roomId'></h4> 
+    <a class='btn-close' title='Close chat'></a> 
+  </div> 
+  <div class='inner-chat'> 
+    <p id = 'displayHelp'> Type /help for a list of commands 
+    <ul id='messages'> 
+    </ul> 
+  </div> 
+  <div class='chat-input-wrapper'> 
+    <input type='text' id='chatInput' placeholder= 'Write here...'  /> 
+  </div> 
+</div>
+</script>
+<script id = "chatTpl" type="text/html">
+  <li class="chat {{cls}}">
+  <label>{{nickname}}</label>
+  <p data-date="{{date}}" title="{{time}}">{{message}}</p>
+</script>
+<script id="statusTpl" type="text/html">
+  <li class = 'status'>
+    <p><span class='oldName'>{{oldName}}</span> is now known as <span class='newName'>{{newName}}</span></p>
+  </li>
+</script>
+<script id="newUserTpl" type="text/html">
+  <li class= "status newUser">
+    <p><span>{{nickname}}</span> has joined the room</p>
+  </li>
+</script>
+<script id="userLeaveTpl" type="text/html">
+  <li class= "status newUser">
+    <p><span>{{nickname}}</span> has left the room</p>
+  </li>
+</script>
+<script id="updateTpl" type="text/html">
+  <li class="status {{cls}}">
+  {{{text}}}
+  </li>
+</script>
+<script id="userListTpl" type="text/html">
+  <p class='userList'>Users in this room right now</p>
+  {{#users}}
+  <p class = "userList {{last}}">- {{name}}</p>
+  {{/users}}
+</script>
+<script id="helpTpl" type="text/html">
+  <p>Type <span>/name your_name</span> to change your display name</p> 
+  <p>Type <span>/list</span> to see a list of users in the room</p> 
+  <p class='last'>Type <span>/help</span> to see a list of commands</p>
+</script>
+<script id="nameExistsTpl" type="text/html">
+  <p>User <span>{{newName}}</span> already exists. Please choose another name.</p>
+</script>
